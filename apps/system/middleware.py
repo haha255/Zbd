@@ -26,10 +26,10 @@ class MenuCollection(MiddlewareMixin):
     def get_permission_url(self, request):  # 获取用户有权限访问的url，存在一个列表中备查
         role_menus = self.get_menu_from_role(request)
         if role_menus is not None:
-            permission_url_list = [menu['permission__url'] for menu in role_menus]
+            permission_url_list = [menu['permissions__url'] for menu in role_menus]
             return permission_url_list
 
-    def get_permission_menu(self, request):
+    def get_permission_menu(self, request):  # 获取用户有权访问的菜单行。
         permission_menu_list = []
         role_menus = self.get_menu_from_role(request)
         if role_menus is not None:
@@ -41,13 +41,13 @@ class MenuCollection(MiddlewareMixin):
                     'icon': item['permissions__icon'],
                     'code': item['permissions__code'],
                     'parent': item['permissions__parent'],
-                    'status': False,
-                    'sub_menu': [],
+                    'status': False,  # 标识头部一级菜单的选中状态，模式为未选中。
+                    'sub_menu': [],  # 用于存放下级菜单数据。
                 }
                 permission_menu_list.append(menu)
             return permission_menu_list
 
-    def get_top_reveal_menu(self, request):
+    def get_top_reveal_menu(self, request):  # 获取头部导航和侧边栏导航数据，根据层级进行组合
         top_menu = []
         permission_menu_dict = {}
         request_url = request.path_info
@@ -55,7 +55,7 @@ class MenuCollection(MiddlewareMixin):
         if permission_menu_list is not None:
             for menu in permission_menu_list:
                 url = menu['url']
-                if url and re.math(url, request_url):
+                if url and re.match(url, request_url):
                     menu['status'] = True
                 if menu['parent'] is None:
                     top_menu.insert(0, menu)
@@ -74,7 +74,7 @@ class MenuCollection(MiddlewareMixin):
                 reveal_menu = None
             return top_menu, reveal_menu
 
-    def process_request(self, request):
+    def process_request(self, request):  # 将request请求传递给view前执行，所有整理组合好的菜单数据写入request。
         if self.get_top_reveal_menu(request):
             request.top_menu, request.reveal_menu = self.get_top_reveal_menu(request)
             request.permission_url_list = self.get_permission_url(request)
