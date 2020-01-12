@@ -36,6 +36,7 @@
                             <th>URL</th>
                             <th>图标</th>
                             <th>父菜单</th>
+                            <th>编号</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -75,7 +76,8 @@
                 "code": "{{ menu.code }}",
                 "url":  "{{ menu.url | default_if_none:'' }}",
                 "icon": "{{ menu.icon | default_if_none:'' }}",
-                "parent": "{{ menu.parent.name }}"
+                "parent": "{{ menu.parent.name }}",
+                'number': "{{ menu.number }}",
             },
             {% endfor %}
         ];
@@ -108,6 +110,9 @@
                             },
                             {
                                 data: "parent",
+                            },
+                            {
+                                data: 'number',
                             },
                             {
                                 data: "id",
