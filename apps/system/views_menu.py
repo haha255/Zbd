@@ -7,7 +7,10 @@ from apps.custom import ZbdUpdateView, ZbdCreateView
 class MenuCreateView(ZbdCreateView):
     model = Menu
     fields = '__all__'
-    extra_context = dict(menu_all=Menu.objects.all())
+
+    def get_context_data(self, **kwargs):
+        kwargs['menu_all'] = Menu.objects.all()
+        return super().get_context_data(**kwargs)
 
 
 class MenuListView(LoginRequiredMixin, ListView):
@@ -19,4 +22,7 @@ class MenuUpdateView(ZbdUpdateView):
     model = Menu
     fields = '__all__'
     template_name_suffix = '_update'
-    extra_context = dict(menu_all=Menu.objects.all())
+
+    def get_context_data(self, **kwargs):
+        kwargs['menu_all'] = Menu.objects.all()
+        return super().get_context_data(**kwargs)
