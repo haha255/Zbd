@@ -1,0 +1,124 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="{% static 'fullcalendar/core/main.css' %}" rel="stylesheet"/>
+    <link href="{% static 'fullcalendar/daygrid/main.css' %}" rel="stylesheet"/>
+    <link href="{% static 'fullcalendar/timegrid/main.css' %}" rel="stylesheet"/>
+    <link href="{% static 'fullcalendar/list/main.css' %}" rel="stylesheet"/>
+    <link href="{% static 'js/plugins/layer/skin/layer.css' %}" rel="stylesheet"/>
+    <style>
+        #calendar{
+            max-width: 900px;
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="calendar"></div>
+{% endblock %}
+
+
+{% block javascripts %}
+    <script src="{% static 'fullcalendar/core/main.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/interaction/main.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/daygrid/main.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/timegrid/main.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/list/main.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+
+    <script src="{% static 'fullcalendar/moment/main.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/core/locales/zh-cn.js' %}"></script>
+    <script>
+        $(function() {
+            var initialLocalCode = 'zh-cn'; //中文
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+                header: {
+                   left: 'prev,next today',
+                   center: 'title',
+                   right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                   },
+                //defaultDate: '2019-08-12',
+                defaultView: 'timeGridWeek', //默认视图
+                locale: initialLocalCode,
+                navLinks: true, // can click day/week names to navigate views
+                selectable: true,
+                selectMirror: true,
+                eventClick: function (info) {
+                    alert('ID:' + info.event.id);
+                },
+                select:function (arg) {  //选中一天或者多天
+                    layer.open({
+                        type: 2,
+                        title: '新建日程',
+                        shadeClose: false,
+                        maxmin: true,
+                        area: ['800px', '450px'],
+                        content: ["{% url 'sometools:mycalendar-create' %}" + '?start=' + arg.startStr.slice(0, 16) + '&end=' + arg.endStr.slice(0, 16), 'no'],
+                        end: function () {
+                            calendar.refetchEvents();
+                            window.location.reload();
+                        }
+                    });
+{#                    var title = prompt('请录入：');#}
+{#                    if (title){#}
+{#                        calendar.addEvent({#}
+{#                            title: title,#}
+{#                            start: arg.start,#}
+{#                            end: arg.end,#}
+{#                            allDay: arg.allDay#}
+{#                        })#}
+{#                    }#}
+{#                    calendar.unselect();#}
+                },
+{#                datesRender: function (info) { //换日期时触发#}
+{#                    alert(info.view.activeStart);#}
+{#                    alert(info.view.activeEnd);#}
+{#                },#}
+                businessHours: true, // display business hours
+                editable: true,
+                eventLimit: true,
+                events: function (info, successcallback, failurecallback) {
+                    $.ajax({
+                       url:'{% url 'sometools:mycalendar-list' %}',
+                       type:'POST',
+                       cache:false,
+                       data:{
+                           'start': info.startStr.slice(0, 19),
+                           'end': info.endStr.slice(0, 19),
+                           csrfmiddlewaretoken:'{{ csrf_token }}'
+                       },
+                       dataType:'json',
+                       success:function (data) {
+                           //alert(data.data[0].type__color);
+                           var events = [];
+                           $.each(data.data, function (i, c) { //第一个参数是index，第二个参数才是数据行
+                              events.push({
+                                  id: c.id,
+                                  title: c.title,
+                                  start: c.start,
+                                  end: c.end,
+                                  allDay: c.allday,
+                                  color: c.type__color
+                                  });
+                           });
+                           successcallback(events);
+                       }
+                    });
+                },
+                eventMouseEnter:function (info) { //显示tips，划过显示
+                    layer.tips(info.event.title, info.el, {time:0});
+                },
+                eventMouseLeave:function (info) { //划出隐藏
+                    var index = layer.tips();
+                    layer.close(index);
+                }
+            });
+        calendar.render();
+        });
+    </script>
+{% endblock %}

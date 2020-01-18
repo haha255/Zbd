@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
-from system.views_user import IndexView, LoginView
+from system.views_user import IndexView, LoginView, LogoutView
 from django.conf import settings
 from django.views.static import serve
 
@@ -24,7 +24,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', IndexView.as_view(), name='index'),
     path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('system/', include('system.urls', namespace='system')),
+    path('sometools/', include('sometools.urls', namespace='sometools')),
+
 ]
 
 if settings.DEBUG:  # 在测试环境中处理图片资源的方式
