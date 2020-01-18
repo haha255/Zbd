@@ -27,7 +27,6 @@
     <script src="{% static 'fullcalendar/timegrid/main.min.js' %}"></script>
     <script src="{% static 'fullcalendar/list/main.min.js' %}"></script>
     <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
-
     <script src="{% static 'fullcalendar/moment/main.min.js' %}"></script>
     <script src="{% static 'fullcalendar/core/locales/zh-cn.js' %}"></script>
     <script>
@@ -48,6 +47,12 @@
                 navLinks: true, // can click day/week names to navigate views
                 selectable: true,
                 selectMirror: true,
+                dateClick:function (info) {
+                    //alert(info.date.format("YYYY-MM-DD"));
+                    //var ss = calendar.formatDate(info.date, 'yyyy-MM-dd');
+                    var ss = moment(info.date).format('YYYY-MM-DD');
+                    alert(ss);
+                },
                 eventClick: function (info) {
                     alert('ID:' + info.event.id);
                 },
@@ -61,7 +66,8 @@
                         content: ["{% url 'sometools:mycalendar-create' %}" + '?start=' + arg.startStr.slice(0, 16) + '&end=' + arg.endStr.slice(0, 16), 'no'],
                         end: function () {
                             calendar.refetchEvents();
-                            window.location.reload();
+                            calendar.rerenderEvents();
+                            //window.location.reload();
                         }
                     });
 {#                    var title = prompt('请录入：');#}
@@ -83,6 +89,7 @@
                 editable: true,
                 eventLimit: true,
                 events: function (info, successcallback, failurecallback) {
+                    //console.log('events trigger');
                     $.ajax({
                        url:'{% url 'sometools:mycalendar-list' %}',
                        type:'POST',
