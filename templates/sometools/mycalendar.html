@@ -65,8 +65,10 @@
                         area: ['800px', '450px'],
                         content: ["{% url 'sometools:mycalendar-create' %}" + '?start=' + arg.startStr.slice(0, 16) + '&end=' + arg.endStr.slice(0, 16), 'no'],
                         end: function () {
-                            calendar.refetchEvents();
-                            calendar.rerenderEvents();
+                            alert('goback');
+                            //calendar.refetchEvents();
+                            //calendar.rerenderEvents();
+                            //calendar.render();
                             //window.location.reload();
                         }
                     });

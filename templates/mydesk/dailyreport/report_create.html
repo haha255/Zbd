@@ -3,7 +3,7 @@
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
-    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-select/css/bootstrap-select.min.css' %}">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
 {% endblock %}
 
@@ -24,9 +24,17 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <label class="col-sm-2 control-label">参加人员</label>
+                    <label class="col-sm-2 control-label">日程性质</label>
                     <div class="col-sm-3">
-                        <select class="form-control select2" multiple="multiple" name="attention" data-placeholder="参加人员"
+                        <label class="control-label">
+                            <input type='checkbox' class="minimal" id="allday" name="allday"/>全天
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group has-feedback">
+                    <label class="col-sm-2 control-label">参加人员</label>
+                    <div class="col-sm-8">
+                        <select class="form-control selectpicker" multiple="multiple" name="participants" data-placeholder="参加人员"
                                 style="width: 100%;">
                             {% for p in participants %}
                                 <option value="{{ p.id }}">{{ p.name }}</option>
@@ -37,11 +45,11 @@
                 <div class="form-group has-feedback">
                     <label class="col-sm-2 control-label">开始时间</label>
                     <div class="col-sm-3">
-                        <input type="text" class="form-control pull-right form_datetime" name="start" readonly >
+                        <input type="text" class="form-control pull-right form_datetime" name="start" readonly value="{{ start }}">
                     </div>
                     <label class="col-sm-2 control-label">结束时间</label>
                     <div class="col-sm-3">
-                        <input type="text" class="form-control pull-right form_datetime" name="end" readonly />
+                        <input type="text" class="form-control pull-right form_datetime" name="end" readonly value="{{ end }}"/>
                     </div>
                 </div>
                 <div class="form-group has-feedback">
@@ -55,15 +63,14 @@
                 </p>
             </fieldset>
 
-    <div class="box-footer ">
+            <div class="box-footer ">
 
-        <div class="row span7 text-center ">
-            <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
-            <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
-        </div>
-    </div>
-
-    </form>
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+        </form>
     </div>
 
 {% endblock %}
@@ -71,22 +78,24 @@
 {% block javascripts %}
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'bootstrap-select/js/bootstrap-select.min.js' %}"></script>
+    <script src="{% static 'bootstrap-select/js/i18n/defaults-zh_CN.min.js' %}"></script>
     <script type="text/javascript">
-
+        $.fn.selectpicker.Constructor.BootstrapVersion = '3.3.6';
         $("#btnSave").click(function () {
             var data = $("#addForm").serialize();
             $.ajax({
                 type: $("#addForm").attr('method'),
-                url: "{% url 'myreport-create' %}",
+                url: "{% url 'mydesk:dailyreport-create' %}",
                 data: data,
                 cache: false,
                 success: function (msg) {
                     if (msg.result) {
                         layer.alert('数据保存成功！', {icon: 1}, function (index) {
-                            parent.location.reload();
+                            parent.layer.closeAll(); //关闭所有弹窗
                         });
                     } else {
-                        layer.alert('数据保存失败,请将信息填写完整！', {icon: 5});
+                        layer.alert(msg.event_create_form_errors, {icon: 5});
                         //$('errorMessage').html(msg.message)
                     }
                     return;
@@ -119,7 +128,9 @@
         $(function () {
             //Initialize Select2 Elements
             $(".select2").select2();
+            $('.selectpicker').selectpicker({
+                noneSelectedText: '请选择' //默认显示内容
+            });
         });
     </script>
-
 {% endblock %}

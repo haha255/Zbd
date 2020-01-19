@@ -2,11 +2,11 @@
 {% load staticfiles %}
 
 {% block css %}
+    <link href="{% static 'js/plugins/layer/skin/layer.css' %}" rel="stylesheet"/>
     <link href="{% static 'fullcalendar/core/main.css' %}" rel="stylesheet"/>
     <link href="{% static 'fullcalendar/daygrid/main.css' %}" rel="stylesheet"/>
     <link href="{% static 'fullcalendar/timegrid/main.css' %}" rel="stylesheet"/>
     <link href="{% static 'fullcalendar/list/main.css' %}" rel="stylesheet"/>
-    <link href="{% static 'js/plugins/layer/skin/layer.css' %}" rel="stylesheet"/>
 {#    <style>#}
 {#        #calendar{#}
 {#            max-width: 900px;#}
@@ -38,14 +38,14 @@
 {% endblock %}
 
 {% block javascripts %}
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
     <script src="{% static 'plugins/daterangepicker/moment.min.js' %}"></script>
     <script src="{% static 'fullcalendar/core/main.min.js' %}"></script>
     <script src="{% static 'fullcalendar/interaction/main.min.js' %}"></script>
     <script src="{% static 'fullcalendar/daygrid/main.min.js' %}"></script>
     <script src="{% static 'fullcalendar/timegrid/main.min.js' %}"></script>
     <script src="{% static 'fullcalendar/list/main.min.js' %}"></script>
-    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
-    <script src="{% static 'fullcalendar/moment/main.min.js' %}"></script>
+{#    <script src="{% static 'fullcalendar/moment/main.min.js' %}"></script>#}
     <script src="{% static 'fullcalendar/core/locales/zh-cn.js' %}"></script>
     <script type="text/javascript">
         $(function () {
@@ -64,15 +64,65 @@
                 selectable: true,
                 selectMirror: true,
                 eventClick:function (info) {
-                    alert('title:' + info.event.title);
+                    var id = info.event.id;
+                    layer.open({
+                       type: 2,
+                       title: '日程详情',
+                       shadeClose: false,
+                       maxmin: true,
+                       area: ['800px', '460px'],
+                       content: ['{% url 'mydesk:dailyreport-detail' %}' + '?id=' + id, 'no'],
+                       end: function () {
+                           calendar.refetchEvents();
+                       }
+                    });
                 },
                 select: function (arg) { //选中一天或者多天
-                  alert('select');
+                    var start = arg.startStr.slice(0, 16);
+                    var end = arg.endStr.slice(0, 16);
+                    layer.open({
+                       type: 2,
+                       title: '新建日程',
+                       shadeClose: false,
+                       maxmin: true,
+                       area: ['800px', '460px'],
+                       content: ["{% url 'mydesk:dailyreport-create' %}" + '?start=' + start + '&end=' + end, 'no'],
+                       end:function () {
+                           calendar.refetchEvents(); //重新加载事件内容。
+                           //calendar.render();
+                       }
+                    });
                 },
                 editable: true,
                 businessHours: true,
                 eventLimit: true,
-                events:[],
+                events:function (info, callback) {
+                    $.ajax({
+                        url: '{% url 'mydesk:dailyreport-json' %}',
+                        type: 'POST',
+                        cache: false,
+                        data: {
+                            'start': info.startStr.slice(0, 19),
+                            'end': info.endStr.slice(0, 19),
+                            csrfmiddlewaretoken:'{{ csrf_token }}'
+                        },
+                        datatype: 'json',
+                        success: function (data) {
+                            var events = [];
+                            $.each(data.data, function (i, c) {//第一个参数是index，第二个参数才是数据行
+                               events.push({
+                                   id: c.id,
+                                   title: c.title,
+                                   start: c.start,
+                                   end: c.end,
+                                   allDay: c.allday,
+                                   color: c.type__color
+                               }) ;
+                            });
+                            callback(events); //回调events
+                        }
+                    });
+                },
                 eventMouseEnter:function (info) { //显示tips，划过显示
                     layer.tips(info.event.title, info.el, {time:0});
                 },

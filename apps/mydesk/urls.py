@@ -2,11 +2,13 @@ from django.urls import path
 from . import views
 
 
-app_name = 'dailyreport'
+app_name = 'mydesk'
 urlpatterns = [
-    path('', views.MyReportView.as_view(), name='dailyreport'),
-    path('dailyreport/', views.MyCalendarView.as_view(), name='dailyreport'),
-    # path('dailyreport/list/', views.EventListView.as_view(), name='dailyreport-list'),
-    # path('dailyreport/create/', views.EventCreateView.as_view(), name='dailyreport-create'),
+    path('', views.MyDeskView.as_view(), name='mydesk'),
+    path('dailyreport/', views.MyReportView.as_view(), name='dailyreport'),
+    path('dailyreport/create/', views.EventCreateView.as_view(), name='dailyreport-create'),
+    path('dailyreport/json/', views.EventListView.as_view(), name='dailyreport-json'),
+    path('dailyreport/detail/', views.EventDetailView.as_view(), name='dailyreport-detail'),
+    path('dailyreport/test/', views.TestView.as_view(), name='dailyreport-test'),
 
 ]

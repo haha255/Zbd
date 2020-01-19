@@ -27,7 +27,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('system/', include('system.urls', namespace='system')),
     path('sometools/', include('sometools.urls', namespace='sometools')),
-    path('dailyreport/', include('dailyreport.urls', namespace='dailyreport')),
+    path('mydesk/', include('mydesk.urls', namespace='mydesk')),
 
 ]
 

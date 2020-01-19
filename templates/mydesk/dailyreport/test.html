@@ -1,10 +1,47 @@
+{% load staticfiles %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/myself.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/skins/skin-blue.min.css' %}">
+  <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-select/css/bootstrap-select.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+
+  <link rel="stylesheet" href="{% static 'bootstrap-select/css/bootstrap-select.min.css' %}">
+
+
+
+
+
 </head>
 <body>
-$END$
+
+
+<select class="selectpicker" multiple>
+  <option>Mustard</option>
+  <option>Ketchup</option>
+  <option>Relish</option>
+   <option>Relittsh</option>
+    <option>土豆</option>
+</select>
+
+<script src="{% static 'plugins/jQuery/jquery-2.2.3.min.js' %}"></script>
+{#<script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>#}
+<script src="{% static 'bootstrap-select-1.13.9/dist/js/bootstrap-select.min.js' %}"></script>
+<script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+     <script>
+
+        $(document).ready(function(){
+          $('.selectpicker').selectpicker({
+          });
+
+          $('.selectpicker').val('Mustard');
+          $('.selectpicker').selectpicker('render');
+        });
+     </script>
 </body>
-</html>
