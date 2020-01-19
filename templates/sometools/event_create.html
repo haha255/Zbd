@@ -71,6 +71,7 @@
                 cache: false,
                 success: function (msg) {
                     if (msg.status == 'success'){
+                        parent.location.reload();
                         layer.alert('事件添加成功！',{icon: 1}, function (index) {
                             parent.layer.closeAll(); //关闭所有弹窗
                         });
